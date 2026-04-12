@@ -4,6 +4,7 @@
 import Navbar from '../components/Navbar.jsx';
 import { Inp, Sel, Card, SectionH, InfoBox } from '../components/FormFields.jsx';
 import EventSelector from '../components/EventSelector.jsx';
+import ImageUpload from '../components/ImageUpload.jsx';
 import { getCategory, getEligibleCategories } from '../utils/category.js';
 import { getAllEligibleEvents } from '../utils/events.js';
 import { calculateFee } from '../utils/fee.js';
@@ -203,6 +204,31 @@ export default function Register({ go, form, setF, errors, onSubmit }) {
                 error={errors.address}
                 placeholder="Complete address"
               />
+            </Card>
+
+            {/* Photo Upload Section */}
+            <Card mb={24}>
+              <SectionH>Player Photo</SectionH>
+              
+              <ImageUpload
+                playerId={form.playerId || `temp_${Date.now()}`}
+                onUploadSuccess={(photoUrl) => setF('photoUrl', photoUrl)}
+                onUploadError={(error) => setF('photoError', error)}
+                currentPhotoUrl={form.photoUrl}
+                required={true}
+              />
+              
+              {/* Photo upload error */}
+              {errors.photoUrl && (
+                <div style={{
+                  color: "#DC2626",
+                  fontSize: 14,
+                  marginTop: 12,
+                  fontFamily: FB
+                }}>
+                  {errors.photoUrl}
+                </div>
+              )}
             </Card>
 
             {/* Event Selection Section */}

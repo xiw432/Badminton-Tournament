@@ -8,12 +8,29 @@ import Rules from './pages/Rules.jsx';
 import Register from './pages/Register.jsx';
 import Payment from './pages/Payment.jsx';
 import Confirm from './pages/Confirm.jsx';
+import AdmitCard from './pages/AdmitCard.jsx';
 import { getCategory } from './utils/category.js';
 import { calculateFee } from './utils/fee.js';
 
 export default function App() {
   // Page state - tracks current page
-  const [page, setPage] = useState("home");
+  const [page, setPage] = useState(() => {
+    // Check URL for admit card route
+    const path = window.location.pathname;
+    if (path.startsWith('/admit-card/')) {
+      return 'admit-card';
+    }
+    return 'home';
+  });
+  
+  // Store player ID for admit card
+  const [admitCardPlayerId, setAdmitCardPlayerId] = useState(() => {
+    const path = window.location.pathname;
+    if (path.startsWith('/admit-card/')) {
+      return path.split('/admit-card/')[1];
+    }
+    return null;
+  });
   
   // Form state - stores registration form data
   const [form, setForm] = useState({
@@ -24,7 +41,9 @@ export default function App() {
     address: "",
     email: "",
     phone: "",
-    selectedEvents: []
+    selectedEvents: [],
+    photoUrl: "",
+    photoError: ""
   });
   
   // Validation errors state
@@ -39,9 +58,20 @@ export default function App() {
   /**
    * Navigate to a different page
    * @param {string} newPage - Page to navigate to
+   * @param {string} param - Optional parameter (e.g., player ID for admit card)
    */
-  const navigate = (newPage) => {
+  const navigate = (newPage, param = null) => {
     setPage(newPage);
+    
+    // Update URL and store player ID for admit card
+    if (newPage === 'admit-card' && param) {
+      setAdmitCardPlayerId(param);
+      window.history.pushState({}, '', `/admit-card/${param}`);
+    } else if (newPage !== 'admit-card') {
+      setAdmitCardPlayerId(null);
+      window.history.pushState({}, '', '/');
+    }
+    
     // Scroll to top on navigation
     window.scrollTo(0, 0);
   };
@@ -133,6 +163,11 @@ export default function App() {
       newErrors.selectedEvents = "Please select at least one event";
     }
     
+    // Photo validation
+    if (!form.photoUrl) {
+      newErrors.photoUrl = "Player photo is required";
+    }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -181,6 +216,7 @@ export default function App() {
         phone: form.phone,
         events: selectedEvents,
         totalFee,
+        photoUrl: form.photoUrl,
         registeredAt: new Date().toISOString()
       };
       
@@ -231,6 +267,20 @@ export default function App() {
       {page === "confirm" && registration && (
         <Confirm
           reg={registration}
+          go={navigate}
+        />
+      )}
+      
+      {page === "admit-card" && (
+        <AdmitCard 
+          playerId={admitCardPlayerId}
+          go={navigate}
+        />
+      )}
+      
+      {page === "test-admit-card" && (
+        <AdmitCard 
+          playerId="LKO2026-TEST"
           go={navigate}
         />
       )}

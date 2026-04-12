@@ -1,0 +1,210 @@
+/* Print Styles for Admit Card */
+@media print {
+  /* Hide all UI elements */
+  .no-print,
+  button,
+  .print-hide,
+  nav,
+  .navbar {
+    display: none !important;
+  }
+
+  /* Page setup */
+  @page {
+    size: A4;
+    margin: 0.5in;
+  }
+
+  body {
+    font-family: 'Times New Roman', serif;
+    font-size: 12pt;
+    line-height: 1.4;
+    color: black;
+    background: white;
+  }
+
+  /* Admit card container */
+  .admit-card {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    background: white;
+    box-shadow: none;
+    border: 2px solid black;
+  }
+
+  /* Header section */
+  .admit-card-header {
+    text-align: center;
+    border-bottom: 2px solid black;
+    padding: 10pt;
+    background: white;
+  }
+
+  .admit-card-title {
+    font-size: 18pt;
+    font-weight: bold;
+    margin: 0 0 5pt 0;
+  }
+
+  .admit-card-subtitle {
+    font-size: 14pt;
+    margin: 0 0 5pt 0;
+  }
+
+  /* Content sections */
+  .admit-card-section {
+    border: 1px solid black;
+    margin: 0;
+    padding: 8pt;
+    page-break-inside: avoid;
+  }
+
+  .section-title {
+    font-size: 12pt;
+    font-weight: bold;
+    margin: 0 0 5pt 0;
+    text-transform: uppercase;
+    border-bottom: 1px solid black;
+    padding-bottom: 2pt;
+  }
+
+  /* Photo section */
+  .photo-container {
+    width: 120px;
+    height: 150px;
+    border: 2px solid black;
+    float: right;
+    margin: 0 0 10pt 10pt;
+  }
+
+  .photo-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Details grid */
+  .details-grid {
+    display: table;
+    width: 100%;
+  }
+
+  .detail-row {
+    display: table-row;
+  }
+
+  .detail-label,
+  .detail-value {
+    display: table-cell;
+    padding: 3pt 5pt;
+    border-bottom: 1px dotted #ccc;
+  }
+
+  .detail-label {
+    font-weight: bold;
+    width: 30%;
+  }
+
+  /* Events section */
+  .events-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .event-item {
+    padding: 2pt 0;
+    border-bottom: 1px dotted #ccc;
+  }
+
+  /* Instructions */
+  .instructions-list {
+    list-style: decimal;
+    padding-left: 20pt;
+    margin: 5pt 0;
+  }
+
+  .instructions-list li {
+    margin: 3pt 0;
+  }
+
+  /* Signature section */
+  .signature-section {
+    display: table;
+    width: 100%;
+    margin-top: 20pt;
+  }
+
+  .signature-box {
+    display: table-cell;
+    width: 50%;
+    text-align: center;
+    padding: 10pt;
+    border-top: 1px solid black;
+  }
+
+  /* Force page breaks */
+  .page-break {
+    page-break-before: always;
+  }
+
+  /* Ensure images print */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Remove any shadows or effects */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+}
+
+/* Screen styles for admit card preview */
+.admit-card-preview {
+  max-width: 210mm;
+  min-height: 297mm;
+  margin: 20px auto;
+  background: white;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  padding: 20px;
+  font-family: 'Times New Roman', serif;
+}
+
+.print-button-container {
+  text-align: center;
+  margin: 20px 0;
+  padding: 20px;
+}
+
+.print-button,
+.download-button {
+  margin: 0 10px;
+  padding: 12px 24px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.print-button {
+  background: #0B1D3A;
+  color: #F5B800;
+}
+
+.download-button {
+  background: #F5B800;
+  color: #0B1D3A;
+}
+
+.print-button:hover,
+.download-button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}

@@ -184,6 +184,19 @@ export default function Home({ go }) {
             }}>
               View Rules
             </button>
+            <button onClick={() => go("test-admit-card")} style={{
+              background: "rgba(16,185,129,0.2)",
+              color: "#10B981",
+              border: "2px solid rgba(16,185,129,0.4)",
+              cursor: "pointer",
+              padding: "15px 36px",
+              borderRadius: 9,
+              fontSize: 16,
+              fontFamily: FB,
+              fontWeight: 600
+            }}>
+              🎫 Test Admit Card
+            </button>
           </div>
 
           {/* Stats */}

@@ -63,6 +63,59 @@ export default function Confirm({ reg, go }) {
         {/* QR Display Component */}
         <QRDisplay registrationData={reg} />
 
+        {/* Admit Card Section */}
+        <Card mb={24} mt={24}>
+          <SectionH>ADMIT CARD</SectionH>
+          <div style={{ textAlign: "center", padding: "20px 0" }}>
+            <div style={{ fontSize: "48px", marginBottom: "15px" }}>🎫</div>
+            <h3 style={{
+              fontFamily: FB,
+              fontSize: "18px",
+              color: N,
+              marginBottom: "10px",
+              fontWeight: "700"
+            }}>
+              Your Admit Card is Ready!
+            </h3>
+            <p style={{
+              color: TM,
+              fontSize: "14px",
+              marginBottom: "20px",
+              fontFamily: FB,
+              lineHeight: 1.6
+            }}>
+              Download your official tournament admit card with your photo and all event details.
+              You'll need this for venue entry.
+            </p>
+            <button
+              onClick={() => go("admit-card", reg.playerId)}
+              style={{
+                background: Y,
+                color: N,
+                border: "none",
+                cursor: "pointer",
+                padding: "14px 32px",
+                borderRadius: "8px",
+                fontSize: "16px",
+                fontFamily: FB,
+                fontWeight: "700",
+                boxShadow: "0 4px 12px rgba(245,184,0,0.3)",
+                transition: "all 0.2s"
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = "translateY(-2px)";
+                e.target.style.boxShadow = "0 6px 16px rgba(245,184,0,0.4)";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = "translateY(0)";
+                e.target.style.boxShadow = "0 4px 12px rgba(245,184,0,0.3)";
+              }}
+            >
+              🎫 View Admit Card
+            </button>
+          </div>
+        </Card>
+
         {/* Venue Info */}
         <Card mb={0} mt={24}>
           <SectionH>VENUE &amp; IMPORTANT INFO</SectionH>
