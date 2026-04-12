@@ -1,0 +1,13 @@
+/* Global styles and design tokens */
+/* TODO: Add CSS variables for theme colors and responsive styles */
+
+:root {
+  /* Theme colors */
+  --navy: #0B1D3A;
+  --yellow: #F5B800;
+  
+  /* Fonts */
+  /* TODO: Import Bebas Neue and Outfit fonts */
+}
+
+/* TODO: Add global styles and responsive media queries */
