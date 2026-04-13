@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabaseClient';
 import { generateAdmitCardPDF, printAdmitCard, generatePDFFilename } from '../utils/pdf';
 import { sendRegistrationConfirmationEmail, validateEmailConfig } from '../utils/email';
+import WhatsAppButton, { WHATSAPP_GROUP_LINK } from '../components/WhatsAppButton.jsx';
 import '../styles/print.css';
 
 /**
@@ -690,6 +691,95 @@ export default function AdmitCard({ playerId, go }) {
               </div>
             </div>
           </div>
+
+          {/* WhatsApp Group Section - Print Friendly */}
+          <div 
+            className="whatsapp-section"
+            style={{
+              marginTop: '20px',
+              padding: '15px',
+              border: `1px solid ${N}`,
+              borderRadius: '8px',
+              backgroundColor: '#F0FDF4',
+              textAlign: 'center'
+            }}
+          >
+            <div style={{ fontSize: '24px', marginBottom: '8px' }}>📲</div>
+            <div style={{
+              fontSize: '13px',
+              fontWeight: 'bold',
+              color: N,
+              marginBottom: '6px',
+              fontFamily: FB
+            }}>
+              Stay Updated with Match Schedules
+            </div>
+            <div style={{
+              fontSize: '11px',
+              color: TM,
+              marginBottom: '8px',
+              fontFamily: FB
+            }}>
+              Join our official WhatsApp group for live updates and announcements
+            </div>
+            <div style={{
+              fontSize: '10px',
+              color: '#059669',
+              fontWeight: 'bold',
+              fontFamily: 'monospace',
+              wordBreak: 'break-all',
+              padding: '6px',
+              backgroundColor: W,
+              border: '1px solid #D1FAE5',
+              borderRadius: '4px'
+            }}>
+              {WHATSAPP_GROUP_LINK}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* WhatsApp CTA - No Print */}
+      <div className="no-print" style={{
+        maxWidth: '210mm',
+        margin: '20px auto',
+        padding: '0 20px'
+      }}>
+        <div style={{
+          background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
+          borderRadius: '16px',
+          padding: '28px',
+          textAlign: 'center',
+          boxShadow: '0 4px 20px rgba(37, 211, 102, 0.3)'
+        }}>
+          <div style={{ fontSize: '40px', marginBottom: '12px' }}>📲</div>
+          <h3 style={{
+            fontFamily: FB,
+            fontSize: '22px',
+            color: W,
+            marginBottom: '10px',
+            fontWeight: '700'
+          }}>
+            Join Our WhatsApp Group
+          </h3>
+          <p style={{
+            color: 'rgba(255,255,255,0.9)',
+            fontSize: '15px',
+            marginBottom: '20px',
+            fontFamily: FB,
+            lineHeight: 1.6
+          }}>
+            Get real-time match schedules, tournament updates, and stay connected with organizers and fellow players.
+          </p>
+          <WhatsAppButton 
+            variant="cta" 
+            text="Join WhatsApp Group →"
+            style={{
+              backgroundColor: W,
+              color: '#25D366',
+              fontSize: 16
+            }}
+          />
         </div>
       </div>
 

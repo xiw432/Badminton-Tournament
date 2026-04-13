@@ -9,6 +9,7 @@ import Register from './pages/Register.jsx';
 import Payment from './pages/Payment.jsx';
 import Confirm from './pages/Confirm.jsx';
 import AdmitCard from './pages/AdmitCard.jsx';
+import WhatsAppButton from './components/WhatsAppButton.jsx';
 import { getCategory } from './utils/category.js';
 import { calculateFee } from './utils/fee.js';
 
@@ -284,6 +285,9 @@ export default function App() {
           go={navigate}
         />
       )}
+      
+      {/* Global Floating WhatsApp Button - Visible on all pages */}
+      <WhatsAppButton variant="floating" text="Join WhatsApp" />
     </>
   );
 }

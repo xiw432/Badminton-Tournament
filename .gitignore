@@ -149,3 +149,6 @@ vite.config.ts.timestamp-*
 
 # Supabase
 supabase/.temp/
+
+# Local Netlify folder
+.netlify

@@ -1,8 +1,11 @@
 // Confirm page - Confirmation page with QR code
 
+import { useEffect, useState } from 'react';
 import Navbar from "../components/Navbar.jsx";
 import QRDisplay from "../components/QRDisplay.jsx";
+import WhatsAppButton from "../components/WhatsAppButton.jsx";
 import { Card, SectionH } from "../components/FormFields.jsx";
+import { WHATSAPP_GROUP_LINK } from "../components/WhatsAppButton.jsx";
 
 // Design tokens
 const N = "#0B1D3A"; // navy
@@ -34,6 +37,28 @@ const FB = "'Outfit', 'Segoe UI', system-ui, sans-serif";
  * @param {function} props.go - Navigation function
  */
 export default function Confirm({ reg, go }) {
+  const [countdown, setCountdown] = useState(5);
+  const [autoOpenEnabled, setAutoOpenEnabled] = useState(true);
+
+  // Auto-open WhatsApp after 5 seconds (optional feature)
+  useEffect(() => {
+    if (!autoOpenEnabled) return;
+
+    const timer = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          // Auto-open WhatsApp in new tab
+          window.open(WHATSAPP_GROUP_LINK, '_blank', 'noopener,noreferrer');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [autoOpenEnabled]);
+
   return (
     <div style={{ background: OW, minHeight: "100vh", paddingTop: 70 }}>
       <Navbar page="confirm" go={go} />
@@ -62,6 +87,98 @@ export default function Confirm({ reg, go }) {
 
         {/* QR Display Component */}
         <QRDisplay registrationData={reg} />
+
+        {/* WhatsApp Group CTA - VERY IMPORTANT */}
+        <Card mb={24} mt={24}>
+          <div style={{
+            background: "linear-gradient(135deg, #25D366 0%, #128C7E 100%)",
+            borderRadius: 16,
+            padding: "32px 28px",
+            textAlign: "center",
+            position: "relative",
+            overflow: "hidden"
+          }}>
+            {/* Decorative elements */}
+            <div style={{
+              position: "absolute",
+              top: -20,
+              right: -20,
+              width: 100,
+              height: 100,
+              borderRadius: "50%",
+              background: "rgba(255,255,255,0.1)",
+              pointerEvents: "none"
+            }} />
+            
+            <div style={{ fontSize: "52px", marginBottom: "16px" }}>🎉</div>
+            <h3 style={{
+              fontFamily: FD,
+              fontSize: "32px",
+              color: W,
+              marginBottom: "12px",
+              letterSpacing: "0.04em",
+              lineHeight: 1
+            }}>
+              REGISTRATION SUCCESSFUL!
+            </h3>
+            <p style={{
+              color: "rgba(255,255,255,0.9)",
+              fontSize: "16px",
+              marginBottom: "24px",
+              fontFamily: FB,
+              lineHeight: 1.6,
+              maxWidth: 520,
+              margin: "0 auto 24px"
+            }}>
+              🎊 Welcome to SMAASH 2026, {reg.name.split(" ")[0]}! 
+              <br />
+              Join our WhatsApp group now to receive match schedules, live updates, and important announcements.
+            </p>
+            <WhatsAppButton 
+              variant="cta" 
+              text="Join WhatsApp Group for Updates →"
+              style={{
+                backgroundColor: W,
+                color: "#25D366",
+                fontSize: 17,
+                padding: "16px 36px"
+              }}
+            />
+            {countdown > 0 && autoOpenEnabled && (
+              <p style={{
+                color: "rgba(255,255,255,0.85)",
+                fontSize: "14px",
+                marginTop: "16px",
+                fontFamily: FB,
+                fontWeight: 600
+              }}>
+                ⏱️ Auto-opening in {countdown} seconds...{' '}
+                <button
+                  onClick={() => setAutoOpenEnabled(false)}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    color: W,
+                    textDecoration: "underline",
+                    cursor: "pointer",
+                    fontFamily: FB,
+                    fontSize: 14
+                  }}
+                >
+                  Cancel
+                </button>
+              </p>
+            )}
+            <p style={{
+              color: "rgba(255,255,255,0.75)",
+              fontSize: "13px",
+              marginTop: countdown > 0 && autoOpenEnabled ? "8px" : "16px",
+              fontFamily: FB
+            }}>
+              ✓ Get match schedules · ✓ Live tournament updates · ✓ Connect with players
+            </p>
+          </div>
+        </Card>
 
         {/* Admit Card Section */}
         <Card mb={24} mt={24}>
