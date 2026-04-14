@@ -134,43 +134,43 @@ export default function Register({ go, form, setF, errors, onSubmit, submitting 
                 max={new Date().toISOString().split('T')[0]}
               />
 
-              {/* Category Badges - shown after DOB entry, clickable to select */}
+              {/* Category selection - multi-select, shown after DOB entry */}
               {form.dob && (
                 <div style={{ marginBottom: 18 }}>
                   {category === 'INELIGIBLE' ? (
-                    <InfoBox 
-                      color="#FEE2E2" 
-                      border="#FCA5A5" 
-                      text="#991B1B"
-                      icon="⚠️"
-                    >
+                    <InfoBox color="#FEE2E2" border="#FCA5A5" text="#991B1B" icon="⚠️">
                       <strong>Ineligible:</strong> Player must be born on or after January 1, 2012 to participate
                     </InfoBox>
                   ) : (
                     <>
-                      <div style={{
-                        fontFamily: FB,
-                        fontSize: 13,
-                        color: "#64748B",
-                        fontWeight: 600,
-                        marginBottom: 10
-                      }}>
-                        Select your playing category:
+                      <div style={{ fontFamily: FB, fontSize: 13, color: "#64748B", fontWeight: 600, marginBottom: 6 }}>
+                        Select categories to play in (you can select multiple):
+                      </div>
+                      <div style={{ fontFamily: FB, fontSize: 12, color: "#94A3B8", marginBottom: 10 }}>
+                        Tap a category to select/deselect it
                       </div>
                       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                         {getEligibleCategories(form.dob).map(cat => {
-                          const isSelected = form.selectedCategory === cat;
+                          const isSelected = (form.selectedCategories || []).includes(cat);
                           return (
                             <button
                               key={cat}
                               type="button"
                               onClick={() => {
-                                setF('selectedCategory', cat);
-                                setF('selectedEvents', []);
+                                const current = form.selectedCategories || [];
+                                const updated = isSelected
+                                  ? current.filter(c => c !== cat)
+                                  : [...current, cat];
+                                setF('selectedCategories', updated);
+                                // Remove events for deselected category
+                                if (isSelected) {
+                                  setF('selectedEvents', (form.selectedEvents || []).filter(e => e.category !== cat));
+                                }
                               }}
                               style={{
                                 display: "inline-flex",
                                 alignItems: "center",
+                                gap: 6,
                                 padding: "10px 20px",
                                 background: isSelected ? Y : "#F1F5F9",
                                 border: `2px solid ${isSelected ? N : "#CBD5E1"}`,
@@ -179,32 +179,22 @@ export default function Register({ go, form, setF, errors, onSubmit, submitting 
                                 transition: "all 0.15s"
                               }}
                             >
-                              <span style={{
-                                fontFamily: FD,
-                                fontSize: 22,
-                                color: N,
-                                letterSpacing: "0.04em"
-                              }}>
+                              {isSelected && <span style={{ fontSize: 14 }}>✓</span>}
+                              <span style={{ fontFamily: FD, fontSize: 22, color: N, letterSpacing: "0.04em" }}>
                                 {cat}
                               </span>
                             </button>
                           );
                         })}
                       </div>
-                      {form.selectedCategory && (
-                        <div style={{
-                          marginTop: 10,
-                          fontFamily: FB,
-                          fontSize: 13,
-                          color: "#059669",
-                          fontWeight: 600
-                        }}>
-                          ✓ Playing in: {form.selectedCategory}
+                      {(form.selectedCategories || []).length > 0 && (
+                        <div style={{ marginTop: 10, fontFamily: FB, fontSize: 13, color: "#059669", fontWeight: 600 }}>
+                          ✓ Playing in: {(form.selectedCategories || []).join(', ')}
                         </div>
                       )}
-                      {errors.selectedCategory && (
+                      {errors.selectedCategories && (
                         <div style={{ color: "#DC2626", fontSize: 13, marginTop: 6, fontFamily: FB }}>
-                          {errors.selectedCategory}
+                          {errors.selectedCategories}
                         </div>
                       )}
                     </>
@@ -292,15 +282,14 @@ export default function Register({ go, form, setF, errors, onSubmit, submitting 
               )}
             </Card>
 
-            {/* Event Selection Section - only show after category is selected */}
-            {hasValidCategory && form.gender && form.selectedCategory && (
+            {/* Event Selection - show for each selected category */}
+            {hasValidCategory && form.gender && (form.selectedCategories || []).length > 0 && (
               <Card mb={24}>
                 <SectionH>Event Selection</SectionH>
                 
                 <EventSelector
-                  dob={form.dob}
                   gender={form.gender}
-                  selectedCategory={form.selectedCategory}
+                  selectedCategories={form.selectedCategories || []}
                   selectedEvents={form.selectedEvents || []}
                   onEventChange={(events) => setF('selectedEvents', events)}
                 />
