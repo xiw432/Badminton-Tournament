@@ -29,7 +29,7 @@ const FB = "'Outfit', 'Segoe UI', system-ui, sans-serif";
  * @param {Object} props.errors - Validation errors object
  * @param {Function} props.onSubmit - Form submission handler
  */
-export default function Register({ go, form, setF, errors, onSubmit }) {
+export default function Register({ go, form, setF, errors, onSubmit, submitting = false }) {
   // Compute category from date of birth
   const category = getCategory(form.dob);
   
@@ -296,36 +296,24 @@ export default function Register({ go, form, setF, errors, onSubmit }) {
             <div style={{ textAlign: "center", marginTop: 32 }}>
               <button
                 type="submit"
-                disabled={category === 'INELIGIBLE'}
+                disabled={category === 'INELIGIBLE' || submitting}
                 style={{
-                  background: category === 'INELIGIBLE' ? "#CBD5E1" : Y,
+                  background: (category === 'INELIGIBLE' || submitting) ? "#CBD5E1" : Y,
                   color: N,
                   border: "none",
-                  cursor: category === 'INELIGIBLE' ? "not-allowed" : "pointer",
+                  cursor: (category === 'INELIGIBLE' || submitting) ? "not-allowed" : "pointer",
                   fontSize: 16,
                   fontFamily: FD,
                   fontWeight: 700,
                   padding: "16px 48px",
                   borderRadius: 12,
                   letterSpacing: "0.06em",
-                  boxShadow: category === 'INELIGIBLE' ? "none" : "0 4px 20px rgba(245,184,0,0.3)",
+                  boxShadow: (category === 'INELIGIBLE' || submitting) ? "none" : "0 4px 20px rgba(245,184,0,0.3)",
                   transition: "all 0.2s",
-                  opacity: category === 'INELIGIBLE' ? 0.6 : 1
-                }}
-                onMouseEnter={(e) => {
-                  if (category !== 'INELIGIBLE') {
-                    e.target.style.transform = "translateY(-2px)";
-                    e.target.style.boxShadow = "0 6px 24px rgba(245,184,0,0.4)";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (category !== 'INELIGIBLE') {
-                    e.target.style.transform = "translateY(0)";
-                    e.target.style.boxShadow = "0 4px 20px rgba(245,184,0,0.3)";
-                  }
+                  opacity: (category === 'INELIGIBLE' || submitting) ? 0.6 : 1
                 }}
               >
-                COMPLETE REGISTRATION →
+                {submitting ? '⏳ REGISTERING...' : 'COMPLETE REGISTRATION →'}
               </button>
               <p style={{
                 fontFamily: FB,

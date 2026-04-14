@@ -49,6 +49,9 @@ export default function App() {
   // Validation errors state
   const [errors, setErrors] = useState({});
   
+  // Loading state during registration API call
+  const [submitting, setSubmitting] = useState(false);
+  
   // Registration data state (after successful submission)
   const [registration, setRegistration] = useState(null);
 
@@ -176,9 +179,8 @@ export default function App() {
   const submitRegistration = async () => {
     if (validateForm()) {
       try {
-        // Show loading state (you can add a loading state if needed)
+        setSubmitting(true);
         
-        // Prepare registration data for backend
         const registrationPayload = {
           name: form.name,
           email: form.email,
@@ -235,13 +237,13 @@ export default function App() {
         }
       } catch (error) {
         console.error('Registration error:', error);
-        
-        // Handle specific error cases
         if (error.message.includes('Email already registered')) {
           setErrors({ email: 'This email is already registered. Please use a different email.' });
         } else {
           alert(`Registration failed: ${error.message}`);
         }
+      } finally {
+        setSubmitting(false);
       }
     }
   };
@@ -264,6 +266,7 @@ export default function App() {
           setF={updateForm}
           errors={errors}
           onSubmit={submitRegistration}
+          submitting={submitting}
         />
       )}
       
