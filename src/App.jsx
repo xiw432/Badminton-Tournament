@@ -41,6 +41,7 @@ export default function App() {
     address: "",
     email: "",
     phone: "",
+    selectedCategory: "",
     selectedEvents: [],
     photoUrl: "",
     photoError: ""
@@ -95,11 +96,12 @@ export default function App() {
       }));
     }
     
-    // Reset event selections when DOB or gender changes
+    // Reset event selections and category when DOB or gender changes
     if (field === 'dob' || field === 'gender') {
       setForm(prev => ({
         ...prev,
         [field]: value,
+        selectedCategory: "",
         selectedEvents: []
       }));
     }
@@ -163,6 +165,11 @@ export default function App() {
       newErrors.selectedEvents = "Please select at least one event";
     }
     
+    // Category selection validation
+    if (!form.selectedCategory) {
+      newErrors.selectedCategory = "Please select a category to play in";
+    }
+    
     // Photo validation
     if (!form.photoUrl) {
       newErrors.photoUrl = "Player photo is required";
@@ -187,7 +194,7 @@ export default function App() {
           phone: form.phone,
           dob: form.dob,
           gender: form.gender,
-          category: getCategory(form.dob),
+          category: form.selectedCategory,
           parentName: form.parentName,
           address: form.address,
           events: form.selectedEvents,
@@ -218,7 +225,7 @@ export default function App() {
             email: result.data.email,
             dob: form.dob,
             gender: form.gender,
-            category: result.data.category,
+            category: form.selectedCategory,
             parentName: form.parentName,
             address: form.address,
             events: form.selectedEvents,

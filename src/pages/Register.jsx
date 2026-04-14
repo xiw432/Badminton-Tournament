@@ -134,7 +134,7 @@ export default function Register({ go, form, setF, errors, onSubmit, submitting 
                 max={new Date().toISOString().split('T')[0]}
               />
 
-              {/* Category Badges - shown after DOB entry */}
+              {/* Category Badges - shown after DOB entry, clickable to select */}
               {form.dob && (
                 <div style={{ marginBottom: 18 }}>
                   {category === 'INELIGIBLE' ? (
@@ -152,35 +152,61 @@ export default function Register({ go, form, setF, errors, onSubmit, submitting 
                         fontFamily: FB,
                         fontSize: 13,
                         color: "#64748B",
-                        fontWeight: 500,
+                        fontWeight: 600,
                         marginBottom: 10
                       }}>
-                        Eligible Categories:
+                        Select your playing category:
                       </div>
                       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                        {getEligibleCategories(form.dob).map(cat => (
-                          <div
-                            key={cat}
-                            style={{
-                              display: "inline-flex",
-                              alignItems: "center",
-                              padding: "8px 16px",
-                              background: cat === category ? YP : "#F1F5F9",
-                              border: `2px solid ${cat === category ? Y : "#CBD5E1"}`,
-                              borderRadius: 10
-                            }}
-                          >
-                            <span style={{
-                              fontFamily: FD,
-                              fontSize: 20,
-                              color: N,
-                              letterSpacing: "0.04em"
-                            }}>
-                              {cat}
-                            </span>
-                          </div>
-                        ))}
+                        {getEligibleCategories(form.dob).map(cat => {
+                          const isSelected = form.selectedCategory === cat;
+                          return (
+                            <button
+                              key={cat}
+                              type="button"
+                              onClick={() => {
+                                setF('selectedCategory', cat);
+                                setF('selectedEvents', []);
+                              }}
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                padding: "10px 20px",
+                                background: isSelected ? Y : "#F1F5F9",
+                                border: `2px solid ${isSelected ? N : "#CBD5E1"}`,
+                                borderRadius: 10,
+                                cursor: "pointer",
+                                transition: "all 0.15s"
+                              }}
+                            >
+                              <span style={{
+                                fontFamily: FD,
+                                fontSize: 22,
+                                color: N,
+                                letterSpacing: "0.04em"
+                              }}>
+                                {cat}
+                              </span>
+                            </button>
+                          );
+                        })}
                       </div>
+                      {form.selectedCategory && (
+                        <div style={{
+                          marginTop: 10,
+                          fontFamily: FB,
+                          fontSize: 13,
+                          color: "#059669",
+                          fontWeight: 600
+                        }}>
+                          ✓ Playing in: {form.selectedCategory}
+                        </div>
+                      )}
+                      {errors.selectedCategory && (
+                        <div style={{ color: "#DC2626", fontSize: 13, marginTop: 6, fontFamily: FB }}>
+                          {errors.selectedCategory}
+                        </div>
+                      )}
                     </>
                   )}
                 </div>
@@ -266,26 +292,21 @@ export default function Register({ go, form, setF, errors, onSubmit, submitting 
               )}
             </Card>
 
-            {/* Event Selection Section */}
-            {hasValidCategory && form.gender && (
+            {/* Event Selection Section - only show after category is selected */}
+            {hasValidCategory && form.gender && form.selectedCategory && (
               <Card mb={24}>
                 <SectionH>Event Selection</SectionH>
                 
                 <EventSelector
                   dob={form.dob}
                   gender={form.gender}
+                  selectedCategory={form.selectedCategory}
                   selectedEvents={form.selectedEvents || []}
                   onEventChange={(events) => setF('selectedEvents', events)}
                 />
                 
-                {/* Event selection error */}
                 {errors.selectedEvents && (
-                  <div style={{
-                    color: "#DC2626",
-                    fontSize: 14,
-                    marginTop: 12,
-                    fontFamily: FB
-                  }}>
+                  <div style={{ color: "#DC2626", fontSize: 14, marginTop: 12, fontFamily: FB }}>
                     {errors.selectedEvents}
                   </div>
                 )}
