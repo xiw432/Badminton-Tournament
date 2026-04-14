@@ -122,6 +122,9 @@ export default function Navbar({ page, go }) {
           <button onClick={() => go("rules")} style={linkStyle("rules")}>
             Rules
           </button>
+          <button onClick={() => go("how-to-register")} style={linkStyle("how-to-register")}>
+            How to Register
+          </button>
           <button
             onClick={() => go("register")}
             style={{

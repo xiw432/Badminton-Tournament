@@ -8,6 +8,7 @@ import Rules from './pages/Rules.jsx';
 import Register from './pages/Register.jsx';
 import Confirm from './pages/Confirm.jsx';
 import AdmitCard from './pages/AdmitCard.jsx';
+import HowToRegister from './pages/HowToRegister.jsx';
 import WhatsAppButton from './components/WhatsAppButton.jsx';
 import { getCategory } from './utils/category.js';
 import { calculateFee } from './utils/fee.js';
@@ -264,6 +265,10 @@ export default function App() {
       
       {page === "rules" && (
         <Rules go={navigate} />
+      )}
+
+      {page === "how-to-register" && (
+        <HowToRegister go={navigate} />
       )}
       
       {page === "register" && (
