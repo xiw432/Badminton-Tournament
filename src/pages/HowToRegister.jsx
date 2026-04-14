@@ -33,7 +33,7 @@ const steps = [
     num: "04",
     icon: "🏸",
     title: "Select Category & Events",
-    desc: "Based on your date of birth, select which age category you want to play in. You can select multiple eligible categories. Then choose your events (Singles, Doubles, Mixed Doubles) for each category.",
+    desc: "Based on your date of birth, select which age category you want to play in. You can select multiple eligible categories. Then choose your events (Singles, Doubles, Mixed Doubles) for each category. If you select Doubles or Mixed Doubles, enter your partner's name — only YOU need to pay, your partner does not pay separately.",
   },
   {
     num: "05",
@@ -67,6 +67,10 @@ const faqs = [
   {
     q: "What is the registration fee?",
     a: "Singles events: Rs.600 per event. Doubles and Mixed Doubles: Rs.1000 per event. Total fee depends on how many events you register for.",
+  },
+  {
+    q: "Do both players in a doubles pair need to register and pay?",
+    a: "No! For Doubles and Mixed Doubles events, only ONE player from each pair needs to register and pay the fee. The other player (partner) does NOT need to register or pay separately. Just enter your partner's name during registration — it will appear on your admit card.",
   },
   {
     q: "How do I pay?",
@@ -170,6 +174,30 @@ export default function HowToRegister({ go }) {
               Registration fee must be paid in CASH to your respected Coach.<br />
               No online payment is accepted. Entry will only be allowed after payment verification.
             </p>
+          </div>
+
+          {/* Doubles Payment Notice */}
+          <div style={{
+            background: "linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)",
+            border: "3px solid #22C55E",
+            borderRadius: 16,
+            padding: "28px 32px",
+            marginBottom: 64,
+            display: "flex",
+            gap: 20,
+            alignItems: "flex-start"
+          }}>
+            <div style={{ fontSize: 40, flexShrink: 0 }}>🤝</div>
+            <div>
+              <h3 style={{ fontFamily: FD, fontSize: 26, color: "#166534", margin: "0 0 10px", letterSpacing: "0.04em" }}>
+                DOUBLES PAYMENT RULE
+              </h3>
+              <p style={{ fontFamily: FB, fontSize: 15, color: "#166534", margin: 0, lineHeight: 1.8, fontWeight: 600 }}>
+                For Doubles and Mixed Doubles events, <strong>only ONE player from each pair needs to register and pay</strong>.<br />
+                Your partner does NOT need to register or pay separately.<br />
+                Simply enter your partner's name during event selection — it will appear on your admit card.
+              </p>
+            </div>
           </div>
 
           {/* FAQ */}

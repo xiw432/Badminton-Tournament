@@ -192,8 +192,13 @@ export default function AdmitCard({ playerId, go }) {
           <div style={{ border: `1px solid ${N}`, marginBottom: 12, padding: 14 }}>
             <h3 style={{ fontSize: 12, fontWeight: 'bold', margin: '0 0 8px', textTransform: 'uppercase', borderBottom: `1px solid ${N}`, paddingBottom: 4 }}>Registered Events</h3>
             {events.length > 0 ? events.map((ev, i) => (
-              <div key={i} style={{ fontSize: 12, padding: '2px 0 2px 10px' }}>
-                • {ev.name} {ev.fee ? `(₹${ev.fee})` : ''}
+              <div key={i} style={{ fontSize: 12, padding: '3px 0 3px 10px', borderBottom: i < events.length - 1 ? '1px dotted #E2E8F0' : 'none' }}>
+                <div>• {ev.name} {ev.category ? `(${ev.category})` : ''} — Rs.{ev.fee || 600}</div>
+                {ev.partnerName && (
+                  <div style={{ fontSize: 11, color: '#059669', paddingLeft: 12, marginTop: 2 }}>
+                    🤝 Partner: {ev.partnerName}
+                  </div>
+                )}
               </div>
             )) : (
               <div style={{ fontSize: 12, color: TM }}>No events registered</div>
