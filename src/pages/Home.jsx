@@ -184,19 +184,6 @@ export default function Home({ go }) {
             }}>
               View Rules
             </button>
-            <button onClick={() => go("test-admit-card")} style={{
-              background: "rgba(16,185,129,0.2)",
-              color: "#10B981",
-              border: "2px solid rgba(16,185,129,0.4)",
-              cursor: "pointer",
-              padding: "15px 36px",
-              borderRadius: 9,
-              fontSize: 16,
-              fontFamily: FB,
-              fontWeight: 600
-            }}>
-              🎫 Test Admit Card
-            </button>
           </div>
 
           {/* Stats */}
@@ -236,6 +223,56 @@ export default function Home({ go }) {
       {/* ── POSTER SECTION ── */}
       <PosterSection posters={posters} />
 
+      {/* ── CASH PAYMENT NOTICE (VERY IMPORTANT) ── */}
+      <div style={{ background: "linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)", padding: "60px 24px", borderTop: "4px solid #F59E0B", borderBottom: "4px solid #F59E0B" }}>
+        <div style={{ maxWidth: 900, margin: "0 auto", textAlign: "center" }}>
+          <div style={{ fontSize: 64, marginBottom: 20 }}>💰</div>
+          <div style={{
+            fontFamily: FD,
+            fontSize: "clamp(36px, 5vw, 52px)",
+            color: "#92400E",
+            letterSpacing: "0.04em",
+            lineHeight: 1.1,
+            marginBottom: 16
+          }}>
+            PAYMENT MODE: CASH ONLY
+          </div>
+          <p style={{
+            fontFamily: FB,
+            fontSize: 18,
+            color: "#78350F",
+            lineHeight: 1.8,
+            fontWeight: 600,
+            maxWidth: 720,
+            margin: "0 auto 24px"
+          }}>
+            ⚠️ All players must pay the registration fee in <strong>CASH</strong> to your respected Coach. 
+            <br />
+            Online payment is NOT available for this tournament.
+          </p>
+          <div style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 12,
+            background: "#FFFFFF",
+            padding: "14px 28px",
+            borderRadius: 12,
+            border: "2px solid #F59E0B",
+            boxShadow: "0 4px 16px rgba(245, 158, 11, 0.2)"
+          }}>
+            <span style={{ fontSize: 24 }}>✅</span>
+            <span style={{
+              fontFamily: FB,
+              fontSize: 16,
+              color: "#92400E",
+              fontWeight: 700
+            }}>
+              Cash Payment to Coach Required
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* ── CATEGORIES & FEES TABLE ── */}
       <div style={{ background: OW, padding: "88px 24px" }}>
         <div style={{ maxWidth: 980, margin: "0 auto" }}>
@@ -253,6 +290,26 @@ export default function Home({ go }) {
               fontFamily: FB,
               fontSize: 16
             }}>Registration fees per player per event</p>
+            <div style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              background: "#FEF3C7",
+              padding: "8px 20px",
+              borderRadius: 20,
+              border: "2px solid #F59E0B",
+              marginTop: 12
+            }}>
+              <span style={{ fontSize: 20 }}>💰</span>
+              <span style={{
+                fontFamily: FB,
+                fontSize: 14,
+                color: "#92400E",
+                fontWeight: 700
+              }}>
+                Payment Mode: Cash Only
+              </span>
+            </div>
           </div>
           <div style={{
             background: W,

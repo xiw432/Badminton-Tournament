@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Navbar from "../components/Navbar.jsx";
-import QRDisplay from "../components/QRDisplay.jsx";
+
 import WhatsAppButton from "../components/WhatsAppButton.jsx";
 import { Card, SectionH } from "../components/FormFields.jsx";
 import { WHATSAPP_GROUP_LINK } from "../components/WhatsAppButton.jsx";
@@ -84,9 +84,6 @@ export default function Confirm({ reg, go }) {
             <span style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.65)", padding: "5px 18px", borderRadius: 20, fontSize: 14, fontFamily: FB }}>{reg.gender}</span>
           </div>
         </div>
-
-        {/* QR Display Component */}
-        <QRDisplay registrationData={reg} />
 
         {/* WhatsApp Group CTA - VERY IMPORTANT */}
         <Card mb={24} mt={24}>
@@ -177,6 +174,76 @@ export default function Confirm({ reg, go }) {
             }}>
               ✓ Get match schedules · ✓ Live tournament updates · ✓ Connect with players
             </p>
+          </div>
+        </Card>
+
+        {/* Cash Payment Instruction - VERY IMPORTANT */}
+        <Card mb={24} mt={24}>
+          <div style={{
+            background: "linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)",
+            border: "3px dashed #F59E0B",
+            borderRadius: 16,
+            padding: "28px 32px",
+            textAlign: "center"
+          }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>💰</div>
+            <h3 style={{
+              fontFamily: FD,
+              fontSize: 28,
+              color: "#92400E",
+              marginBottom: 12,
+              letterSpacing: "0.04em"
+            }}>
+              PAYMENT STATUS: ⏳ PENDING (CASH)
+            </h3>
+            <div style={{
+              background: "#FFFFFF",
+              border: "2px solid #F59E0B",
+              borderRadius: 12,
+              padding: "20px 24px",
+              marginBottom: 16
+            }}>
+              <p style={{
+                fontFamily: FB,
+                fontSize: 16,
+                color: "#78350F",
+                margin: 0,
+                lineHeight: 1.8,
+                fontWeight: 700
+              }}>
+                ⚠️ Please pay the registration fee of <span style={{ fontSize: 20, color: "#92400E" }}>₹{reg.totalFee.toLocaleString()}</span> in CASH to your respected Coach.
+                <br />
+                <strong>Entry will be allowed only after payment verification.</strong>
+              </p>
+            </div>
+            <div style={{
+              display: "flex",
+              gap: 12,
+              justifyContent: "center",
+              flexWrap: "wrap",
+              marginTop: 16
+            }}>
+              <div style={{
+                background: "#FFFFFF",
+                padding: "10px 20px",
+                borderRadius: 10,
+                border: "1px solid #F59E0B"
+              }}>
+                <span style={{ fontFamily: FB, fontSize: 14, color: "#92400E", fontWeight: 600 }}>
+                  💵 Cash Payment Required
+                </span>
+              </div>
+              <div style={{
+                background: "#FFFFFF",
+                padding: "10px 20px",
+                borderRadius: 10,
+                border: "1px solid #F59E0B"
+              }}>
+                <span style={{ fontFamily: FB, fontSize: 14, color: "#92400E", fontWeight: 600 }}>
+                  👨‍🏫 Pay to Your Coach
+                </span>
+              </div>
+            </div>
           </div>
         </Card>
 

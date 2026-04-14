@@ -6,7 +6,6 @@ import { useState } from 'react';
 import Home from './pages/Home.jsx';
 import Rules from './pages/Rules.jsx';
 import Register from './pages/Register.jsx';
-import Payment from './pages/Payment.jsx';
 import Confirm from './pages/Confirm.jsx';
 import AdmitCard from './pages/AdmitCard.jsx';
 import WhatsAppButton from './components/WhatsAppButton.jsx';
@@ -52,9 +51,6 @@ export default function App() {
   
   // Registration data state (after successful submission)
   const [registration, setRegistration] = useState(null);
-  
-  // Payment loading state
-  const [paymentLoading, setPaymentLoading] = useState(false);
 
   /**
    * Navigate to a different page
@@ -174,63 +170,81 @@ export default function App() {
   };
 
   /**
-   * Submit registration form
-   * Validates form and navigates to payment page
+   * Submit registration form and complete registration
+   * Validates form, generates player ID, and saves data
    */
-  const submitRegistration = () => {
+  const submitRegistration = async () => {
     if (validateForm()) {
-      navigate("payment");
+      try {
+        // Show loading state (you can add a loading state if needed)
+        
+        // Prepare registration data for backend
+        const registrationPayload = {
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          dob: form.dob,
+          gender: form.gender,
+          category: getCategory(form.dob),
+          parentName: form.parentName,
+          address: form.address,
+          events: form.selectedEvents,
+          totalFee: calculateFee(form.selectedEvents),
+          photoUrl: form.photoUrl
+        };
+
+        // Call backend registration function
+        const response = await fetch('/api/register-player', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(registrationPayload)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Registration failed');
+        }
+
+        if (result.success) {
+          // Create registration record for frontend display
+          const registrationData = {
+            playerId: result.data.playerId,
+            name: result.data.name,
+            email: result.data.email,
+            dob: form.dob,
+            gender: form.gender,
+            category: result.data.category,
+            parentName: form.parentName,
+            address: form.address,
+            events: form.selectedEvents,
+            totalFee: calculateFee(form.selectedEvents),
+            photoUrl: form.photoUrl,
+            paymentMode: 'cash',
+            paymentStatus: 'pending',
+            registeredAt: new Date().toISOString(),
+            pdfUrl: result.data.pdfUrl
+          };
+          
+          setRegistration(registrationData);
+          navigate("confirm");
+        } else {
+          throw new Error('Registration failed');
+        }
+      } catch (error) {
+        console.error('Registration error:', error);
+        
+        // Handle specific error cases
+        if (error.message.includes('Email already registered')) {
+          setErrors({ email: 'This email is already registered. Please use a different email.' });
+        } else {
+          alert(`Registration failed: ${error.message}`);
+        }
+      }
     }
   };
-
-  /**
-   * Process payment and complete registration
-   * Generates player ID and creates registration record
-   */
-  const processPayment = () => {
-    setPaymentLoading(true);
-    
-    // Simulate payment processing
-    setTimeout(() => {
-      // Generate player ID (format: LKO2026-XXXX)
-      const playerId = `LKO2026-${Math.floor(1000 + Math.random() * 9000)}`;
-      
-      // Compute category
-      const category = getCategory(form.dob);
-      
-      // Use selected events from form
-      const selectedEvents = form.selectedEvents || [];
-      
-      // Calculate total fee
-      const totalFee = calculateFee(selectedEvents);
-      
-      // Create registration record
-      const registrationData = {
-        playerId,
-        name: form.name,
-        dob: form.dob,
-        gender: form.gender,
-        category,
-        parentName: form.parentName,
-        address: form.address,
-        email: form.email,
-        phone: form.phone,
-        events: selectedEvents,
-        totalFee,
-        photoUrl: form.photoUrl,
-        registeredAt: new Date().toISOString()
-      };
-      
-      setRegistration(registrationData);
-      setPaymentLoading(false);
-      navigate("confirm");
-    }, 2000);
-  };
-
-  // Compute derived values for current form state
-  const category = getCategory(form.dob);
-  const selectedEvents = form.selectedEvents || [];
-  const totalFee = calculateFee(selectedEvents);
 
   // Render current page
   return (
@@ -253,18 +267,6 @@ export default function App() {
         />
       )}
       
-      {page === "payment" && (
-        <Payment
-          go={navigate}
-          form={form}
-          events={selectedEvents}
-          totalFee={totalFee}
-          cat={category}
-          onPay={processPayment}
-          loading={paymentLoading}
-        />
-      )}
-      
       {page === "confirm" && registration && (
         <Confirm
           reg={registration}
@@ -275,13 +277,6 @@ export default function App() {
       {page === "admit-card" && (
         <AdmitCard 
           playerId={admitCardPlayerId}
-          go={navigate}
-        />
-      )}
-      
-      {page === "test-admit-card" && (
-        <AdmitCard 
-          playerId="LKO2026-TEST"
           go={navigate}
         />
       )}

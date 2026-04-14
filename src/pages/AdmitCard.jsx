@@ -1,70 +1,41 @@
 import { useState, useEffect, useRef } from 'react';
-import { supabase } from '../supabaseClient';
-import { generateAdmitCardPDF, printAdmitCard, generatePDFFilename } from '../utils/pdf';
-import { sendRegistrationConfirmationEmail, validateEmailConfig } from '../utils/email';
 import WhatsAppButton, { WHATSAPP_GROUP_LINK } from '../components/WhatsAppButton.jsx';
 import '../styles/print.css';
 
-/**
- * AdmitCard Component - JEE/CUET Style Professional Admit Card
- * Features:
- * - A4 print layout with professional design
- * - Player photo integration
- * - PDF download and print functionality
- * - Email delivery capability
- * - Access control (payment verification)
- */
+const N = "#0B1D3A";
+const Y = "#F5B800";
+const W = "#FFFFFF";
+const TM = "#475569";
+const BD = "#E2E8F0";
+const FD = "'Bebas Neue', 'Impact', 'Arial Black', sans-serif";
+const FB = "'Outfit', 'Segoe UI', system-ui, sans-serif";
+
 export default function AdmitCard({ playerId, go }) {
   const admitCardRef = useRef(null);
-  
   const [playerData, setPlayerData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [generating, setGenerating] = useState(false);
-  const [emailSending, setEmailSending] = useState(false);
+  const [printing, setPrinting] = useState(false);
 
-  // Theme colors
-  const N = "#0B1D3A";   // navy
-  const Y = "#F5B800";   // yellow
-  const W = "#FFFFFF";
-  const TM = "#475569";  // text-mid
-  const BD = "#E2E8F0";  // border
-
-  const FD = "'Bebas Neue', 'Impact', 'Arial Black', sans-serif";
-  const FB = "'Outfit', 'Segoe UI', system-ui, sans-serif";
-
-  /**
-   * Fetch player data from Supabase
-   */
   useEffect(() => {
     const fetchPlayerData = async () => {
       try {
         setLoading(true);
-        
-        const { data, error } = await supabase
-          .from('registrations')
-          .select('*')
-          .eq('player_id', playerId)
-          .single();
 
-        if (error) {
-          throw error;
+        const response = await fetch(`/api/get-admit-card?playerId=${playerId}`);
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to fetch player data');
         }
 
-        if (!data) {
+        if (result.success && result.data) {
+          setPlayerData(result.data);
+        } else {
           setError('Player not found. Please check your Player ID.');
-          return;
         }
-
-        // Check payment status
-        if (data.payment_status !== 'paid' && data.payment_status !== 'confirmed') {
-          setError('Access denied. Payment not confirmed. Please complete payment first.');
-          return;
-        }
-
-        setPlayerData(data);
-      } catch (error) {
-        console.error('Error fetching player data:', error);
+      } catch (err) {
+        console.error('Error fetching player data:', err);
         setError('Failed to load admit card. Please try again.');
       } finally {
         setLoading(false);
@@ -79,173 +50,49 @@ export default function AdmitCard({ playerId, go }) {
     }
   }, [playerId]);
 
-  /**
-   * Handle PDF download
-   */
-  const handleDownloadPDF = async () => {
-    try {
-      setGenerating(true);
-      const filename = generatePDFFilename(playerData);
-      await generateAdmitCardPDF(admitCardRef.current, filename);
-    } catch (error) {
-      console.error('PDF generation error:', error);
-      alert('Failed to generate PDF. Please try again.');
-    } finally {
-      setGenerating(false);
-    }
-  };
-
-  /**
-   * Handle print
-   */
   const handlePrint = () => {
-    printAdmitCard();
+    setPrinting(true);
+    setTimeout(() => {
+      window.print();
+      setPrinting(false);
+    }, 100);
   };
 
-  /**
-   * Handle email sending
-   */
-  const handleSendEmail = async () => {
-    if (!validateEmailConfig()) {
-      alert('Email service not configured. Please contact administrator.');
-      return;
-    }
-
-    try {
-      setEmailSending(true);
-      await sendRegistrationConfirmationEmail(playerData, admitCardRef.current);
-      alert('Admit card sent to your email successfully!');
-    } catch (error) {
-      console.error('Email sending error:', error);
-      alert('Failed to send email. Please try again or contact support.');
-    } finally {
-      setEmailSending(false);
-    }
-  };
-
-  /**
-   * Format events for display
-   */
-  const formatEvents = (events) => {
-    if (!events || events.length === 0) return {};
-    
-    // Handle both TEXT[] and JSONB formats
-    let eventList = [];
-    
-    if (Array.isArray(events)) {
-      // If it's already an array (TEXT[] from database)
-      eventList = events.map(eventName => ({
-        name: eventName,
-        category: eventName.includes('U-9') ? 'U-9' : 
-                 eventName.includes('U-11') ? 'U-11' :
-                 eventName.includes('U-13') ? 'U-13' :
-                 eventName.includes('U-15') ? 'U-15' : 'General',
-        fee: 600 // Default fee
-      }));
-    } else if (typeof events === 'object' && events.length !== undefined) {
-      // If it's JSONB format
-      eventList = events;
-    }
-    
-    // Group events by category
-    const grouped = {};
-    eventList.forEach(event => {
-      const category = event.category || 'General';
-      if (!grouped[category]) {
-        grouped[category] = [];
-      }
-      grouped[category].push(event);
-    });
-
-    return grouped;
-  };
-
-  /**
-   * Format date for display
-   */
   const formatDate = (dateString) => {
     if (!dateString) return 'Not provided';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-IN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
+    return new Date(dateString).toLocaleDateString('en-IN', {
+      day: '2-digit', month: '2-digit', year: 'numeric'
     });
+  };
+
+  const formatEvents = (events) => {
+    if (!events || events.length === 0) return [];
+    if (Array.isArray(events)) {
+      return events.map(e => typeof e === 'string' ? { name: e, fee: 600 } : e);
+    }
+    return [];
   };
 
   if (loading) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#f8f9fa'
-      }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8f9fa' }}>
         <div style={{ textAlign: 'center' }}>
-          <div style={{
-            width: '50px',
-            height: '50px',
-            border: `4px solid ${BD}`,
-            borderTop: `4px solid ${Y}`,
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            margin: '0 auto 20px'
-          }} />
+          <div style={{ width: 50, height: 50, border: `4px solid ${BD}`, borderTop: `4px solid ${Y}`, borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 20px' }} />
           <p style={{ fontFamily: FB, color: TM }}>Loading admit card...</p>
         </div>
+        <style>{`@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }`}</style>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#f8f9fa',
-        padding: '20px'
-      }}>
-        <div style={{
-          backgroundColor: W,
-          padding: '40px',
-          borderRadius: '12px',
-          textAlign: 'center',
-          maxWidth: '500px',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
-        }}>
-          <div style={{ fontSize: '48px', marginBottom: '20px' }}>⚠️</div>
-          <h2 style={{
-            fontFamily: FD,
-            fontSize: '24px',
-            color: N,
-            marginBottom: '10px'
-          }}>
-            Access Denied
-          </h2>
-          <p style={{
-            fontFamily: FB,
-            color: TM,
-            marginBottom: '20px',
-            lineHeight: 1.6
-          }}>
-            {error}
-          </p>
-          <button
-            onClick={() => go && go('home')}
-            style={{
-              backgroundColor: Y,
-              color: N,
-              border: 'none',
-              padding: '12px 24px',
-              borderRadius: '6px',
-              fontFamily: FB,
-              fontWeight: '600',
-              cursor: 'pointer'
-            }}
-          >
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8f9fa', padding: 20 }}>
+        <div style={{ backgroundColor: W, padding: 40, borderRadius: 12, textAlign: 'center', maxWidth: 500, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+          <div style={{ fontSize: 48, marginBottom: 20 }}>⚠️</div>
+          <h2 style={{ fontFamily: FD, fontSize: 24, color: N, marginBottom: 10 }}>Not Found</h2>
+          <p style={{ fontFamily: FB, color: TM, marginBottom: 20, lineHeight: 1.6 }}>{error}</p>
+          <button onClick={() => go && go('home')} style={{ backgroundColor: Y, color: N, border: 'none', padding: '12px 24px', borderRadius: 6, fontFamily: FB, fontWeight: 600, cursor: 'pointer' }}>
             Go to Home
           </button>
         </div>
@@ -253,543 +100,164 @@ export default function AdmitCard({ playerId, go }) {
     );
   }
 
-  const groupedEvents = formatEvents(playerData.events || playerData.selectedEvents);
+  const events = formatEvents(playerData.events);
 
   return (
     <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh', padding: '20px 0' }}>
-      {/* Action Buttons */}
-      <div className="print-button-container no-print">
-        <button
-          onClick={handlePrint}
-          className="print-button"
-          style={{
-            backgroundColor: N,
-            color: Y,
-            border: 'none',
-            padding: '12px 24px',
-            borderRadius: '6px',
-            fontFamily: FB,
-            fontWeight: '600',
-            cursor: 'pointer',
-            margin: '0 10px'
-          }}
-        >
-          🖨️ Print Admit Card
-        </button>
-        
-        <button
-          onClick={handleDownloadPDF}
-          disabled={generating}
-          className="download-button"
-          style={{
-            backgroundColor: Y,
-            color: N,
-            border: 'none',
-            padding: '12px 24px',
-            borderRadius: '6px',
-            fontFamily: FB,
-            fontWeight: '600',
-            cursor: generating ? 'not-allowed' : 'pointer',
-            margin: '0 10px',
-            opacity: generating ? 0.7 : 1
-          }}
-        >
-          {generating ? '📄 Generating...' : '📄 Download PDF'}
-        </button>
 
-        {validateEmailConfig() && (
-          <button
-            onClick={handleSendEmail}
-            disabled={emailSending}
-            style={{
-              backgroundColor: '#10B981',
-              color: W,
-              border: 'none',
-              padding: '12px 24px',
-              borderRadius: '6px',
-              fontFamily: FB,
-              fontWeight: '600',
-              cursor: emailSending ? 'not-allowed' : 'pointer',
-              margin: '0 10px',
-              opacity: emailSending ? 0.7 : 1
-            }}
-          >
-            {emailSending ? '📧 Sending...' : '📧 Email Admit Card'}
-          </button>
+      {/* Action Buttons - hidden on print */}
+      <div className="no-print" style={{ display: 'flex', justifyContent: 'center', gap: 12, padding: '0 20px 20px', flexWrap: 'wrap' }}>
+        <button onClick={() => go && go('home')} style={{ backgroundColor: N, color: Y, border: 'none', padding: '12px 24px', borderRadius: 6, fontFamily: FB, fontWeight: 600, cursor: 'pointer' }}>
+          ← Back to Home
+        </button>
+        <button onClick={handlePrint} disabled={printing} style={{ backgroundColor: Y, color: N, border: 'none', padding: '12px 24px', borderRadius: 6, fontFamily: FB, fontWeight: 600, cursor: 'pointer' }}>
+          🖨️ Print / Save as PDF
+        </button>
+        {playerData.pdfUrl && (
+          <a href={playerData.pdfUrl} target="_blank" rel="noopener noreferrer" style={{ backgroundColor: '#059669', color: W, border: 'none', padding: '12px 24px', borderRadius: 6, fontFamily: FB, fontWeight: 600, cursor: 'pointer', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
+            📄 Download PDF
+          </a>
         )}
       </div>
 
       {/* Admit Card */}
-      <div 
+      <div
         ref={admitCardRef}
         className="admit-card admit-card-preview"
-        style={{
-          maxWidth: '210mm',
-          minHeight: '297mm',
-          margin: '0 auto',
-          backgroundColor: W,
-          border: `3px solid ${N}`,
-          fontFamily: 'Times New Roman, serif'
-        }}
+        style={{ maxWidth: '210mm', margin: '0 auto', backgroundColor: W, border: `3px solid ${N}`, fontFamily: 'Arial, sans-serif' }}
       >
         {/* Header */}
-        <div 
-          className="admit-card-header"
-          style={{
-            textAlign: 'center',
-            borderBottom: `2px solid ${N}`,
-            padding: '15px',
-            backgroundColor: W
-          }}
-        >
-          <h1 
-            className="admit-card-title"
-            style={{
-              fontFamily: FD,
-              fontSize: '28px',
-              fontWeight: 'bold',
-              color: N,
-              margin: '0 0 5px 0',
-              letterSpacing: '2px'
-            }}
-          >
+        <div style={{ backgroundColor: N, padding: '20px 24px', textAlign: 'center' }}>
+          <h1 style={{ fontFamily: FD, fontSize: 26, color: Y, margin: '0 0 6px', letterSpacing: 2 }}>
             SMAASH BADMINTON TOURNAMENT 2026
           </h1>
-          <h2 
-            className="admit-card-subtitle"
-            style={{
-              fontSize: '18px',
-              color: TM,
-              margin: '0 0 10px 0',
-              fontWeight: 'normal'
-            }}
-          >
+          <h2 style={{ fontSize: 14, color: W, margin: '0 0 10px', fontWeight: 'normal', letterSpacing: 1 }}>
             PLAYER REGISTRATION / ADMIT CARD
           </h2>
-          <div style={{ fontSize: '14px', color: TM, lineHeight: 1.4 }}>
-            <strong>Dates:</strong> April 24–26, 2026<br />
-            <strong>Venue:</strong> Gopi Nath Laxman Das Rastogi Inter College, Aishbagh, Lucknow
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)', lineHeight: 1.6 }}>
+            <strong style={{ color: Y }}>Dates:</strong> April 24–26, 2026 &nbsp;|&nbsp;
+            <strong style={{ color: Y }}>Venue:</strong> Gopi Nath Laxman Das Rastogi Inter College, Aishbagh, Lucknow
           </div>
         </div>
 
-        {/* Main Content */}
-        <div style={{ padding: '20px', position: 'relative' }}>
-          {/* Photo Section */}
-          <div 
-            className="photo-container"
-            style={{
-              position: 'absolute',
-              top: '20px',
-              right: '20px',
-              width: '120px',
-              height: '150px',
-              border: `2px solid ${N}`,
-              backgroundColor: '#f8f9fa',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexDirection: 'column'
-            }}
-          >
-            {playerData.photo_url ? (
-              <img
-                src={playerData.photo_url}
-                alt="Player Photo"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }}
-                crossOrigin="anonymous"
-              />
+        {/* Body */}
+        <div style={{ padding: 20, position: 'relative' }}>
+
+          {/* Photo */}
+          <div style={{ position: 'absolute', top: 20, right: 20, width: 110, height: 140, border: `2px solid ${N}`, backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+            {playerData.photoUrl ? (
+              <img src={playerData.photoUrl} alt="Player" style={{ width: '100%', height: '100%', objectFit: 'cover' }} crossOrigin="anonymous" />
             ) : (
-              <div style={{ textAlign: 'center', padding: '10px' }}>
-                <div style={{ fontSize: '24px', marginBottom: '5px' }}>📷</div>
-                <div style={{ fontSize: '10px', color: TM }}>
-                  Passport Size<br />Photograph
-                </div>
+              <div style={{ textAlign: 'center', padding: 8 }}>
+                <div style={{ fontSize: 24 }}>📷</div>
+                <div style={{ fontSize: 9, color: TM, marginTop: 4 }}>Passport Photo</div>
               </div>
             )}
           </div>
 
-          {/* Player Details Section */}
-          <div 
-            className="admit-card-section"
-            style={{
-              border: `1px solid ${N}`,
-              marginBottom: '15px',
-              padding: '15px',
-              marginRight: '140px' // Space for photo
-            }}
-          >
-            <h3 
-              className="section-title"
-              style={{
-                fontSize: '14px',
-                fontWeight: 'bold',
-                margin: '0 0 10px 0',
-                textTransform: 'uppercase',
-                borderBottom: `1px solid ${N}`,
-                paddingBottom: '5px'
-              }}
-            >
-              Player Details
-            </h3>
-            
-            <div className="details-grid" style={{ display: 'table', width: '100%' }}>
-              <div className="detail-row" style={{ display: 'table-row' }}>
-                <div className="detail-label" style={{ display: 'table-cell', fontWeight: 'bold', width: '40%', padding: '3px 0' }}>
-                  Player Name:
-                </div>
-                <div className="detail-value" style={{ display: 'table-cell', padding: '3px 0' }}>
-                  {playerData.player_name || playerData.name}
-                </div>
+          {/* Player Details */}
+          <div style={{ border: `1px solid ${N}`, marginBottom: 12, padding: 14, marginRight: 130 }}>
+            <h3 style={{ fontSize: 12, fontWeight: 'bold', margin: '0 0 8px', textTransform: 'uppercase', borderBottom: `1px solid ${N}`, paddingBottom: 4 }}>Player Details</h3>
+            {[
+              ['Player ID', <strong style={{ color: N, fontSize: 14 }}>{playerData.playerId}</strong>],
+              ['Player Name', playerData.name],
+              ['Date of Birth', formatDate(playerData.dob)],
+              ['Gender', playerData.gender],
+              ['Category', playerData.category],
+            ].map(([label, value]) => (
+              <div key={label} style={{ display: 'flex', padding: '3px 0', fontSize: 12 }}>
+                <div style={{ fontWeight: 'bold', width: '40%' }}>{label}:</div>
+                <div>{value}</div>
               </div>
-              
-              <div className="detail-row" style={{ display: 'table-row' }}>
-                <div className="detail-label" style={{ display: 'table-cell', fontWeight: 'bold', padding: '3px 0' }}>
-                  Player ID:
-                </div>
-                <div className="detail-value" style={{ display: 'table-cell', padding: '3px 0' }}>
-                  {playerData.player_id}
-                </div>
+            ))}
+          </div>
+
+          {/* Contact Details */}
+          <div style={{ border: `1px solid ${N}`, marginBottom: 12, padding: 14 }}>
+            <h3 style={{ fontSize: 12, fontWeight: 'bold', margin: '0 0 8px', textTransform: 'uppercase', borderBottom: `1px solid ${N}`, paddingBottom: 4 }}>Contact Details</h3>
+            {[
+              ['Parent/Guardian', playerData.parentName || 'Not provided'],
+              ['Phone', playerData.phone],
+              ['Email', playerData.email],
+              ['Address', playerData.address || 'Not provided'],
+            ].map(([label, value]) => (
+              <div key={label} style={{ display: 'flex', padding: '3px 0', fontSize: 12 }}>
+                <div style={{ fontWeight: 'bold', width: '30%' }}>{label}:</div>
+                <div style={{ flex: 1 }}>{value}</div>
               </div>
-              
-              <div className="detail-row" style={{ display: 'table-row' }}>
-                <div className="detail-label" style={{ display: 'table-cell', fontWeight: 'bold', padding: '3px 0' }}>
-                  Date of Birth:
-                </div>
-                <div className="detail-value" style={{ display: 'table-cell', padding: '3px 0' }}>
-                  {formatDate(playerData.dob)}
-                </div>
+            ))}
+          </div>
+
+          {/* Events */}
+          <div style={{ border: `1px solid ${N}`, marginBottom: 12, padding: 14 }}>
+            <h3 style={{ fontSize: 12, fontWeight: 'bold', margin: '0 0 8px', textTransform: 'uppercase', borderBottom: `1px solid ${N}`, paddingBottom: 4 }}>Registered Events</h3>
+            {events.length > 0 ? events.map((ev, i) => (
+              <div key={i} style={{ fontSize: 12, padding: '2px 0 2px 10px' }}>
+                • {ev.name} {ev.fee ? `(₹${ev.fee})` : ''}
               </div>
-              
-              <div className="detail-row" style={{ display: 'table-row' }}>
-                <div className="detail-label" style={{ display: 'table-cell', fontWeight: 'bold', padding: '3px 0' }}>
-                  Gender:
-                </div>
-                <div className="detail-value" style={{ display: 'table-cell', padding: '3px 0' }}>
-                  {playerData.gender}
-                </div>
+            )) : (
+              <div style={{ fontSize: 12, color: TM }}>No events registered</div>
+            )}
+          </div>
+
+          {/* Payment */}
+          <div style={{ border: '3px dashed #F59E0B', marginBottom: 12, padding: 14, backgroundColor: '#FEF3C7' }}>
+            <h3 style={{ fontSize: 12, fontWeight: 'bold', margin: '0 0 8px', textTransform: 'uppercase', borderBottom: '2px solid #F59E0B', paddingBottom: 4, color: '#92400E' }}>Payment Details</h3>
+            {[
+              ['Total Fee', `₹${playerData.totalFee || 0}`],
+              ['Payment Mode', '💰 CASH'],
+              ['Payment Status', '⏳ PENDING'],
+            ].map(([label, value]) => (
+              <div key={label} style={{ display: 'flex', padding: '3px 0', fontSize: 12, color: '#78350F' }}>
+                <div style={{ fontWeight: 'bold', width: '40%' }}>{label}:</div>
+                <div style={{ fontWeight: 'bold' }}>{value}</div>
               </div>
+            ))}
+            <div style={{ marginTop: 8, padding: 8, backgroundColor: W, border: '1px solid #F59E0B', borderRadius: 4, fontSize: 11, color: '#78350F', fontWeight: 'bold' }}>
+              ⚠️ Pay registration fee in CASH to your Coach. Entry allowed only after payment verification.
             </div>
           </div>
 
-          {/* Contact Details Section */}
-          <div 
-            className="admit-card-section"
-            style={{
-              border: `1px solid ${N}`,
-              marginBottom: '15px',
-              padding: '15px'
-            }}
-          >
-            <h3 className="section-title" style={{
-              fontSize: '14px',
-              fontWeight: 'bold',
-              margin: '0 0 10px 0',
-              textTransform: 'uppercase',
-              borderBottom: `1px solid ${N}`,
-              paddingBottom: '5px'
-            }}>
-              Contact Details
-            </h3>
-            
-            <div className="details-grid" style={{ display: 'table', width: '100%' }}>
-              <div className="detail-row" style={{ display: 'table-row' }}>
-                <div className="detail-label" style={{ display: 'table-cell', fontWeight: 'bold', width: '30%', padding: '3px 0' }}>
-                  Parent Name:
-                </div>
-                <div className="detail-value" style={{ display: 'table-cell', padding: '3px 0' }}>
-                  {playerData.parent_name || 'Not provided'}
-                </div>
-              </div>
-              
-              <div className="detail-row" style={{ display: 'table-row' }}>
-                <div className="detail-label" style={{ display: 'table-cell', fontWeight: 'bold', padding: '3px 0' }}>
-                  Phone:
-                </div>
-                <div className="detail-value" style={{ display: 'table-cell', padding: '3px 0' }}>
-                  {playerData.phone}
-                </div>
-              </div>
-              
-              <div className="detail-row" style={{ display: 'table-row' }}>
-                <div className="detail-label" style={{ display: 'table-cell', fontWeight: 'bold', padding: '3px 0' }}>
-                  Email:
-                </div>
-                <div className="detail-value" style={{ display: 'table-cell', padding: '3px 0' }}>
-                  {playerData.email}
-                </div>
-              </div>
-              
-              <div className="detail-row" style={{ display: 'table-row' }}>
-                <div className="detail-label" style={{ display: 'table-cell', fontWeight: 'bold', padding: '3px 0' }}>
-                  Address:
-                </div>
-                <div className="detail-value" style={{ display: 'table-cell', padding: '3px 0' }}>
-                  {playerData.address || 'Not provided'}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Events Section */}
-          <div 
-            className="admit-card-section"
-            style={{
-              border: `1px solid ${N}`,
-              marginBottom: '15px',
-              padding: '15px'
-            }}
-          >
-            <h3 className="section-title" style={{
-              fontSize: '14px',
-              fontWeight: 'bold',
-              margin: '0 0 10px 0',
-              textTransform: 'uppercase',
-              borderBottom: `1px solid ${N}`,
-              paddingBottom: '5px'
-            }}>
-              Registered Events
-            </h3>
-            
-            <div className="events-list">
-              {Object.keys(groupedEvents).length > 0 ? (
-                Object.entries(groupedEvents).map(([category, events]) => (
-                  <div key={category} style={{ marginBottom: '10px' }}>
-                    <div style={{ fontWeight: 'bold', fontSize: '13px', marginBottom: '5px' }}>
-                      {category}:
-                    </div>
-                    {events.map((event, index) => (
-                      <div key={index} className="event-item" style={{
-                        padding: '2px 0 2px 15px',
-                        fontSize: '12px'
-                      }}>
-                        • {event.name} (₹{event.fee})
-                      </div>
-                    ))}
-                  </div>
-                ))
-              ) : (
-                <div style={{ fontSize: '12px', color: TM }}>No events registered</div>
-              )}
-            </div>
-          </div>
-
-          {/* Payment Section */}
-          <div 
-            className="admit-card-section"
-            style={{
-              border: `1px solid ${N}`,
-              marginBottom: '15px',
-              padding: '15px'
-            }}
-          >
-            <h3 className="section-title" style={{
-              fontSize: '14px',
-              fontWeight: 'bold',
-              margin: '0 0 10px 0',
-              textTransform: 'uppercase',
-              borderBottom: `1px solid ${N}`,
-              paddingBottom: '5px'
-            }}>
-              Payment Details
-            </h3>
-            
-            <div className="details-grid" style={{ display: 'table', width: '100%' }}>
-              <div className="detail-row" style={{ display: 'table-row' }}>
-                <div className="detail-label" style={{ display: 'table-cell', fontWeight: 'bold', width: '30%', padding: '3px 0' }}>
-                  Total Fee Paid:
-                </div>
-                <div className="detail-value" style={{ display: 'table-cell', padding: '3px 0' }}>
-                  ₹{playerData.totalFee || playerData.total_fee}
-                </div>
-              </div>
-              
-              <div className="detail-row" style={{ display: 'table-row' }}>
-                <div className="detail-label" style={{ display: 'table-cell', fontWeight: 'bold', padding: '3px 0' }}>
-                  Payment Status:
-                </div>
-                <div className="detail-value" style={{ display: 'table-cell', padding: '3px 0', color: '#10B981', fontWeight: 'bold' }}>
-                  ✅ Confirmed
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Instructions Section */}
-          <div 
-            className="admit-card-section"
-            style={{
-              border: `1px solid ${N}`,
-              marginBottom: '20px',
-              padding: '15px'
-            }}
-          >
-            <h3 className="section-title" style={{
-              fontSize: '14px',
-              fontWeight: 'bold',
-              margin: '0 0 10px 0',
-              textTransform: 'uppercase',
-              borderBottom: `1px solid ${N}`,
-              paddingBottom: '5px'
-            }}>
-              Important Instructions
-            </h3>
-            
-            <ol className="instructions-list" style={{
-              fontSize: '12px',
-              lineHeight: 1.4,
-              paddingLeft: '20px',
-              margin: '0'
-            }}>
+          {/* Instructions */}
+          <div style={{ border: `1px solid ${N}`, marginBottom: 16, padding: 14 }}>
+            <h3 style={{ fontSize: 12, fontWeight: 'bold', margin: '0 0 8px', textTransform: 'uppercase', borderBottom: `1px solid ${N}`, paddingBottom: 4 }}>Important Instructions</h3>
+            <ol style={{ fontSize: 11, lineHeight: 1.6, paddingLeft: 18, margin: 0 }}>
               <li>Carry this admit card to the venue</li>
-              <li>Bring valid ID proof for verification</li>
-              <li>Report 30 minutes before your match time</li>
-              <li>Follow fair play rules at all times</li>
-              <li>Organizer's decision is final</li>
-              <li>Keep this document safe</li>
+              <li>Pay registration fee in CASH to your Coach before the tournament</li>
+              <li>Bring valid ID proof / birth certificate for verification</li>
+              <li>Report 30 minutes before your scheduled match</li>
+              <li>Players must bring their own rackets</li>
+              <li>Organizer's decision is final in all matters</li>
             </ol>
           </div>
 
-          {/* Signature Section */}
-          <div 
-            className="signature-section"
-            style={{
-              display: 'table',
-              width: '100%',
-              marginTop: '30px'
-            }}
-          >
-            <div 
-              className="signature-box"
-              style={{
-                display: 'table-cell',
-                width: '50%',
-                textAlign: 'center',
-                padding: '20px 10px 10px',
-                borderTop: `1px solid ${N}`
-              }}
-            >
-              <div style={{ fontSize: '12px', fontWeight: 'bold' }}>
-                Player Signature
-              </div>
-            </div>
-            <div 
-              className="signature-box"
-              style={{
-                display: 'table-cell',
-                width: '50%',
-                textAlign: 'center',
-                padding: '20px 10px 10px',
-                borderTop: `1px solid ${N}`
-              }}
-            >
-              <div style={{ fontSize: '12px', fontWeight: 'bold' }}>
-                Organizer Signature
-              </div>
-            </div>
+          {/* Signatures */}
+          <div style={{ display: 'flex', marginTop: 20 }}>
+            <div style={{ flex: 1, textAlign: 'center', paddingTop: 20, borderTop: `1px solid ${N}`, marginRight: 20, fontSize: 12, fontWeight: 'bold' }}>Player Signature</div>
+            <div style={{ flex: 1, textAlign: 'center', paddingTop: 20, borderTop: `1px solid ${N}`, fontSize: 12, fontWeight: 'bold' }}>Organizer Signature</div>
           </div>
 
-          {/* WhatsApp Group Section - Print Friendly */}
-          <div 
-            className="whatsapp-section"
-            style={{
-              marginTop: '20px',
-              padding: '15px',
-              border: `1px solid ${N}`,
-              borderRadius: '8px',
-              backgroundColor: '#F0FDF4',
-              textAlign: 'center'
-            }}
-          >
-            <div style={{ fontSize: '24px', marginBottom: '8px' }}>📲</div>
-            <div style={{
-              fontSize: '13px',
-              fontWeight: 'bold',
-              color: N,
-              marginBottom: '6px',
-              fontFamily: FB
-            }}>
-              Stay Updated with Match Schedules
-            </div>
-            <div style={{
-              fontSize: '11px',
-              color: TM,
-              marginBottom: '8px',
-              fontFamily: FB
-            }}>
-              Join our official WhatsApp group for live updates and announcements
-            </div>
-            <div style={{
-              fontSize: '10px',
-              color: '#059669',
-              fontWeight: 'bold',
-              fontFamily: 'monospace',
-              wordBreak: 'break-all',
-              padding: '6px',
-              backgroundColor: W,
-              border: '1px solid #D1FAE5',
-              borderRadius: '4px'
-            }}>
-              {WHATSAPP_GROUP_LINK}
-            </div>
+          {/* WhatsApp - print friendly */}
+          <div style={{ marginTop: 16, padding: 12, border: `1px solid ${N}`, borderRadius: 6, backgroundColor: '#F0FDF4', textAlign: 'center' }}>
+            <div style={{ fontSize: 11, fontWeight: 'bold', color: N, marginBottom: 4 }}>📲 Join WhatsApp Group for Match Schedules & Updates</div>
+            <div style={{ fontSize: 10, color: '#059669', fontFamily: 'monospace', wordBreak: 'break-all' }}>{WHATSAPP_GROUP_LINK}</div>
           </div>
         </div>
       </div>
 
-      {/* WhatsApp CTA - No Print */}
-      <div className="no-print" style={{
-        maxWidth: '210mm',
-        margin: '20px auto',
-        padding: '0 20px'
-      }}>
-        <div style={{
-          background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
-          borderRadius: '16px',
-          padding: '28px',
-          textAlign: 'center',
-          boxShadow: '0 4px 20px rgba(37, 211, 102, 0.3)'
-        }}>
-          <div style={{ fontSize: '40px', marginBottom: '12px' }}>📲</div>
-          <h3 style={{
-            fontFamily: FB,
-            fontSize: '22px',
-            color: W,
-            marginBottom: '10px',
-            fontWeight: '700'
-          }}>
-            Join Our WhatsApp Group
-          </h3>
-          <p style={{
-            color: 'rgba(255,255,255,0.9)',
-            fontSize: '15px',
-            marginBottom: '20px',
-            fontFamily: FB,
-            lineHeight: 1.6
-          }}>
-            Get real-time match schedules, tournament updates, and stay connected with organizers and fellow players.
+      {/* WhatsApp CTA below card - no print */}
+      <div className="no-print" style={{ maxWidth: '210mm', margin: '20px auto', padding: '0 20px' }}>
+        <div style={{ background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)', borderRadius: 16, padding: 28, textAlign: 'center' }}>
+          <div style={{ fontSize: 36, marginBottom: 10 }}>📲</div>
+          <h3 style={{ fontFamily: FB, fontSize: 20, color: W, marginBottom: 8, fontWeight: 700 }}>Join Our WhatsApp Group</h3>
+          <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 14, marginBottom: 16, fontFamily: FB, lineHeight: 1.6 }}>
+            Get real-time match schedules, tournament updates, and stay connected with organizers.
           </p>
-          <WhatsAppButton 
-            variant="cta" 
-            text="Join WhatsApp Group →"
-            style={{
-              backgroundColor: W,
-              color: '#25D366',
-              fontSize: 16
-            }}
-          />
+          <WhatsAppButton variant="cta" text="Join WhatsApp Group →" style={{ backgroundColor: W, color: '#25D366', fontSize: 15 }} />
         </div>
       </div>
 
-      {/* CSS for animations */}
-      <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
+      <style>{`@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }`}</style>
     </div>
   );
 }

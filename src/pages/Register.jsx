@@ -73,6 +73,41 @@ export default function Register({ go, form, setF, errors, onSubmit }) {
             </p>
           </div>
 
+          {/* Cash Payment Notice - IMPORTANT */}
+          <div style={{
+            background: "linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)",
+            border: "3px solid #F59E0B",
+            borderRadius: 16,
+            padding: "24px 28px",
+            marginBottom: 32,
+            boxShadow: "0 4px 16px rgba(245, 158, 11, 0.2)"
+          }}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 16 }}>
+              <div style={{ fontSize: 36, flexShrink: 0 }}>💰</div>
+              <div>
+                <h3 style={{
+                  fontFamily: FD,
+                  fontSize: 24,
+                  color: "#92400E",
+                  margin: "0 0 8px",
+                  letterSpacing: "0.04em"
+                }}>
+                  CASH PAYMENT ONLY
+                </h3>
+                <p style={{
+                  fontFamily: FB,
+                  fontSize: 15,
+                  color: "#78350F",
+                  margin: 0,
+                  lineHeight: 1.7,
+                  fontWeight: 600
+                }}>
+                  ⚠️ Payment is NOT online. Registration fee must be paid in CASH to your respected Coach before the tournament.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <form onSubmit={handleSubmit}>
             
             {/* Personal Information Section */}
@@ -290,8 +325,17 @@ export default function Register({ go, form, setF, errors, onSubmit }) {
                   }
                 }}
               >
-                PROCEED TO PAYMENT
+                COMPLETE REGISTRATION →
               </button>
+              <p style={{
+                fontFamily: FB,
+                fontSize: 13,
+                color: "#78350F",
+                marginTop: 16,
+                fontWeight: 600
+              }}>
+                💰 Remember: Pay registration fee in CASH to your Coach
+              </p>
             </div>
 
           </form>
