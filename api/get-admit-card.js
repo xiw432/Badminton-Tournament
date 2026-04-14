@@ -68,7 +68,7 @@ export default async function handler(req, res) {
     const pdfPath  = `admit-cards/${player.player_id}.pdf`;
 
     const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('player-documents')
+      .from('playe_documents')
       .upload(pdfPath, pdfBytes, { contentType: 'application/pdf', upsert: true });
 
     if (uploadError) {
@@ -77,7 +77,7 @@ export default async function handler(req, res) {
     }
 
     const { data: { publicUrl } } = supabase.storage
-      .from('player-documents')
+      .from('playe_documents')
       .getPublicUrl(pdfPath);
 
     await supabase.from('players').update({ pdf_url: publicUrl }).eq('player_id', player.player_id);
