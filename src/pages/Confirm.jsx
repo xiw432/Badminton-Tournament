@@ -306,7 +306,7 @@ export default function Confirm({ reg, go }) {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14 }}>
             {[
               { icon: "📍", title: "Venue", desc: "Gopi Nath Laxman Das Rastogi Inter College, Aishbagh, Lucknow" },
-              { icon: "📅", title: "Dates", desc: "April 17th – 19th, 2026" },
+              { icon: "📅", title: "Dates", desc: "April 22nd – 24th, 2026" },
               { icon: "📞", title: "Contact", desc: "7052416803 · 9839174810 · 97953100021" },
               { icon: "⏰", title: "Reporting", desc: "Arrive 30 minutes before your scheduled match" },
               { icon: "🪪", title: "ID Required", desc: "Carry original age proof / birth certificate" },

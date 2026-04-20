@@ -91,7 +91,7 @@ export default function Home({ go }) {
             marginBottom: 30,
             flexWrap: "wrap"
           }}>
-            {["🏸 24–26 April 2026", "📍 Aishbagh, Lucknow", "👦👧 U-9 to U-15"].map(t => (
+            {["🏸 22–24 April 2026", "📍 Aishbagh, Lucknow", "👦👧 U-9 to U-15"].map(t => (
               <span key={t} style={{
                 background: "rgba(245,184,0,0.1)",
                 color: Y,
@@ -146,7 +146,7 @@ export default function Home({ go }) {
             fontFamily: FB
           }}>
             📍 Gopi Nath Laxman Das Rastogi Inter College, Aishbagh, Lucknow<br />
-            📅 April 24th – 26th, 2026
+            📅 April 22nd – 24th, 2026
           </p>
 
           {/* CTA */}
@@ -465,9 +465,9 @@ export default function Home({ go }) {
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {[
-              { day: "D1", date: "April 24, 2026", title: "Day 1 — Opening", events: "U-9 & U-11 Boys and Girls Singles" },
-              { day: "D2", date: "April 25, 2026", title: "Day 2 — Semis", events: "U-13 & U-15 Boys and Girls Singles" },
-              { day: "D3", date: "April 26, 2026", title: "Day 3 — Finals", events: "All Doubles, Mixed Doubles & Grand Finals" },
+              { day: "D1", date: "April 22, 2026", title: "Day 1 — Opening", events: "U-9 & U-11 Boys and Girls Singles" },
+              { day: "D2", date: "April 23, 2026", title: "Day 2 — Semis", events: "U-13 & U-15 Boys and Girls Singles" },
+              { day: "D3", date: "April 24, 2026", title: "Day 3 — Finals", events: "All Doubles, Mixed Doubles & Grand Finals" },
             ].map(d => (
               <div key={d.day} style={{
                 background: W,

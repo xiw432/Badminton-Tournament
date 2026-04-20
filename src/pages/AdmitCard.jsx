@@ -135,7 +135,7 @@ export default function AdmitCard({ playerId, go }) {
             PLAYER REGISTRATION / ADMIT CARD
           </h2>
           <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)', lineHeight: 1.6 }}>
-            <strong style={{ color: Y }}>Dates:</strong> April 24–26, 2026 &nbsp;|&nbsp;
+            <strong style={{ color: Y }}>Dates:</strong> April 22–24, 2026 &nbsp;|&nbsp;
             <strong style={{ color: Y }}>Venue:</strong> Gopi Nath Laxman Das Rastogi Inter College, Aishbagh, Lucknow
           </div>
         </div>
