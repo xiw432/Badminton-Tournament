@@ -24,13 +24,6 @@ export default async function handler(req, res) {
 
     const supabase = getSupabaseAdmin();
 
-    // ── Duplicate check ───────────────────────────────────────────────────────
-    const { data: existing } = await supabase
-      .from('players').select('player_id').eq('email', body.email).maybeSingle();
-    if (existing) {
-      return res.status(409).json({ error: 'Email already registered', playerId: existing.player_id });
-    }
-
     // ── Generate Player ID ────────────────────────────────────────────────────
     const playerId = `LKO2026-${Math.floor(1000 + Math.random() * 9000)}`;
 

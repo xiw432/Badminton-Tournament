@@ -245,11 +245,7 @@ export default function App() {
         }
       } catch (error) {
         console.error('Registration error:', error);
-        if (error.message.includes('Email already registered')) {
-          setErrors({ email: 'This email is already registered. Please use a different email.' });
-        } else {
-          alert(`Registration failed: ${error.message}`);
-        }
+        alert(`Registration failed: ${error.message}`);
       } finally {
         setSubmitting(false);
       }
