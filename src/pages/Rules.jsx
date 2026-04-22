@@ -53,6 +53,7 @@ export default function Rules({ go }) {
     "Proper sports attire and non-marking shoes are mandatory on court.",
     "Misbehavior or unsportsmanlike conduct may result in disqualification.",
     "Organizers' decisions on all matters will be final and binding.",
+    "Any protest against a player must be submitted BEFORE the match begins with a written application and a protest fee of ₹5,000. The organizers will verify the player's details and take appropriate action.",
   ];
 
   return (
@@ -358,6 +359,112 @@ export default function Rules({ go }) {
                 </li>
               ))}
             </ol>
+          </div>
+        </div>
+      </div>
+
+      {/* ── PROTEST POLICY ── */}
+      <div style={{ background: W, padding: "88px 24px" }}>
+        <div style={{ maxWidth: 800, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 40 }}>
+            <div style={{ fontFamily: FD, fontSize: 52, color: N, letterSpacing: "0.04em", lineHeight: 1 }}>
+              PROTEST POLICY
+            </div>
+            <p style={{ color: TM, marginTop: 10, fontFamily: FB, fontSize: 16 }}>
+              Rules for raising a protest against any player
+            </p>
+          </div>
+
+          {/* Main protest box */}
+          <div style={{
+            background: "linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)",
+            border: "3px solid #F59E0B",
+            borderRadius: 20,
+            padding: "36px 40px",
+            boxShadow: "0 8px 32px rgba(245,158,11,0.15)"
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 28 }}>
+              <div style={{ fontSize: 44 }}>⚖️</div>
+              <div style={{ fontFamily: FD, fontSize: 32, color: "#92400E", letterSpacing: "0.04em" }}>
+                HOW TO FILE A PROTEST
+              </div>
+            </div>
+
+            {/* Steps */}
+            {[
+              {
+                num: "01",
+                icon: "⏰",
+                title: "Before the Match Only",
+                desc: "Any protest against a player must be submitted BEFORE the match begins. Protests will not be accepted after the match has started or concluded."
+              },
+              {
+                num: "02",
+                icon: "📝",
+                title: "Written Application Required",
+                desc: "Submit a written application clearly stating the reason for the protest, the player's name, and the specific rule violation you believe has occurred."
+              },
+              {
+                num: "03",
+                icon: "💰",
+                title: "Protest Fee: ₹5,000",
+                desc: "A non-refundable protest fee of ₹5,000 must be paid in CASH along with the written application. No protest will be considered without the fee."
+              },
+              {
+                num: "04",
+                icon: "🔍",
+                title: "Verification Process",
+                desc: "The organizers will verify the player's details, age proof, and registration documents. The decision of the organizing committee will be final and binding."
+              },
+            ].map((step, i) => (
+              <div key={step.num} style={{
+                display: "flex",
+                gap: 20,
+                marginBottom: i < 3 ? 24 : 0,
+                paddingBottom: i < 3 ? 24 : 0,
+                borderBottom: i < 3 ? "2px dashed #F59E0B" : "none",
+                alignItems: "flex-start"
+              }}>
+                <div style={{
+                  minWidth: 48,
+                  height: 48,
+                  background: "#92400E",
+                  borderRadius: 12,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0
+                }}>
+                  <span style={{ fontFamily: FD, fontSize: 18, color: Y, letterSpacing: "0.04em" }}>{step.num}</span>
+                </div>
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                    <span style={{ fontSize: 18 }}>{step.icon}</span>
+                    <span style={{ fontFamily: FB, fontWeight: 700, color: "#92400E", fontSize: 16 }}>{step.title}</span>
+                  </div>
+                  <p style={{ fontFamily: FB, fontSize: 14, color: "#78350F", margin: 0, lineHeight: 1.7 }}>
+                    {step.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Warning note */}
+          <div style={{
+            background: "rgba(239,68,68,0.08)",
+            border: "1px solid rgba(239,68,68,0.25)",
+            borderRadius: 12,
+            padding: "18px 24px",
+            marginTop: 20,
+            display: "flex",
+            alignItems: "flex-start",
+            gap: 14
+          }}>
+            <div style={{ fontSize: 24, flexShrink: 0 }}>⚠️</div>
+            <p style={{ fontFamily: FB, fontSize: 14, color: "#991B1B", margin: 0, lineHeight: 1.7, fontWeight: 500 }}>
+              <strong>Important:</strong> The protest fee of ₹5,000 is non-refundable regardless of the outcome. False or frivolous protests may result in disciplinary action against the protesting party. The organizing committee's decision on all protests is final.
+            </p>
           </div>
         </div>
       </div>
